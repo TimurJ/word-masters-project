@@ -10,6 +10,15 @@ body {
   padding: 0px;
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .header {
   width: 100%;
   display: flex;
@@ -27,8 +36,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 40px;
   row-gap: 10px;
+}
+
+.loading-icon {
+  font-size: 30px;
+  animation: spin 1s linear infinite;
+  margin: 10px;
+  visibility: hidden;
 }
 
 .row {
@@ -36,7 +51,7 @@ body {
   column-gap: 10px;
 }
 
-.letter-box {
+.letter-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,4 +60,19 @@ body {
   border: 2px solid lightgrey;
   font-size: 22px;
   font-weight: bold;
+}
+
+.correct-letter {
+  background-color: green;
+  color: white;
+}
+
+.wrong-letter {
+  background-color: grey;
+  color: white;
+}
+
+.semi-correct-letter {
+  background-color: orange;
+  color: white;
 }
