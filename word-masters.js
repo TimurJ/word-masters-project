@@ -1,4 +1,5 @@
-let userWord = document.querySelectorAll(`.container-1`)
+const loadingIcon = document.querySelector(".loading-icon")
+let userWordContainer = document.querySelectorAll(`.container-1`)
 let userLetterIndex = 0
 let rowNumber = 1
 let matchingLetters = []
@@ -12,34 +13,58 @@ function getNewUserLetters() {
   userLetterIndex = 0
   rowNumber++
   matchingLetters = []
-  userWord = document.querySelectorAll(`.container-${rowNumber}`)
+  userWordContainer = document.querySelectorAll(`.container-${rowNumber}`)
+}
+
+async function validateWord(word) {
+  loadingIcon.style.visibility = "visible"
+  const promise = await fetch("https://words.dev-apis.com/validate-word", {
+    method: "POST",
+    body: JSON.stringify({ word: word }),
+  })
+  const result = await promise.json()
+  loadingIcon.style.visibility = "hidden"
+  return result.validWord
+}
+
+async function getWordOfTheDay() {
+  loadingIcon.style.visibility = "visible"
+  const promise = await fetch("https://words.dev-apis.com/word-of-the-day")
+  const result = await promise.json()
+  loadingIcon.style.visibility = "hidden"
+  return result.word.toUpperCase().split("")
 }
 
 async function handleEnter() {
-  const promise = await fetch("https://words.dev-apis.com/word-of-the-day?puzzle=1031")
-  const result = await promise.json()
-  const correctWord = result.word.toUpperCase().split("")
-  const duplicateLetters = correctWord.filter((item, index) => correctWord.indexOf(item) !== index)
-  const userWordString = Array.from(userWord)
+  const wordOfTheDay = await getWordOfTheDay()
+  const userWord = Array.from(userWordContainer)
     .map((element) => element.innerText)
     .join("")
+  const isValidWord = await validateWord(userWord)
 
-  correctWord.forEach((correctLetter, index) => {
-    if (correctLetter === userWord[index].innerText && !duplicateLetters.includes(correctLetter)) {
+  const duplicateLetters = wordOfTheDay.filter((item, index) => wordOfTheDay.indexOf(item) !== index)
+
+  if (!isValidWord) {
+    userWordContainer.forEach((element) => (element.style.animation = "border-flash 1s"))
+    return
+  }
+
+  wordOfTheDay.forEach((correctLetter, index) => {
+    if (correctLetter === userWordContainer[index].innerText && !duplicateLetters.includes(correctLetter)) {
       matchingLetters.push(correctLetter)
     }
   })
 
-  userWord.forEach((element, index) => {
+  userWordContainer.forEach((element, index) => {
     const userLetter = element.innerText
-    const correctLetter = correctWord[index]
+    const correctLetter = wordOfTheDay[index]
 
     if (userLetter === correctLetter) {
       element.classList.add("correct-letter")
       return
     }
 
-    if (correctWord.includes(userLetter) && !matchingLetters.includes(userLetter)) {
+    if (wordOfTheDay.includes(userLetter) && !matchingLetters.includes(userLetter)) {
       if (!duplicateLetters.includes(userLetter)) {
         matchingLetters.push(userLetter)
       }
@@ -50,14 +75,14 @@ async function handleEnter() {
     element.classList.add("wrong-letter")
   })
 
-  if (userWordString === correctWord.join("")) {
+  if (userWord === wordOfTheDay.join("")) {
     gameEnd = true
     alert("You Win!")
   }
 
-  if (rowNumber > 5 && userWordString !== correctWord.join("")) {
+  if (rowNumber > 5 && userWord !== wordOfTheDay.join("")) {
     gameEnd = true
-    alert(`You Lost! The word of the day was ${correctWord.join("")}`)
+    alert(`You Lost! The word of the day was ${wordOfTheDay.join("")}`)
   }
 
   getNewUserLetters()
@@ -69,7 +94,7 @@ function handleKeyPress(event) {
   }
 
   if (isLetter(event.key) && userLetterIndex < 5) {
-    userWord[userLetterIndex].innerText = event.key.toUpperCase()
+    userWordContainer[userLetterIndex].innerText = event.key.toUpperCase()
     userLetterIndex++
   }
 
@@ -79,7 +104,7 @@ function handleKeyPress(event) {
 
   if (event.key === "Backspace" && userLetterIndex > 0) {
     userLetterIndex--
-    userWord[userLetterIndex].innerText = ""
+    userWordContainer[userLetterIndex].innerText = ""
   }
 }
 
