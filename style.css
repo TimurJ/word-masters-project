@@ -51,7 +51,6 @@ body {
   font-size: 30px;
   animation: spin 1s linear infinite;
   margin: 10px;
-  visibility: hidden;
 }
 
 .row {
@@ -80,7 +79,15 @@ body {
   color: white;
 }
 
-.semi-correct-letter {
+.close-letter {
   background-color: orange;
   color: white;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.invalid-word {
+  animation: border-flash 1s;
 }
