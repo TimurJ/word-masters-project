@@ -1,4 +1,4 @@
-const loadingIcon = document.querySelector(".loading-icon")
+const loadingIcon = document.querySelector('.loading-icon')
 let userWordContainer = document.querySelectorAll(`.container-1`)
 let userLetterIndex = 0
 let rowNumber = 1
@@ -17,40 +17,45 @@ function getNewUserLetters() {
 }
 
 async function validateWord(word) {
-  loadingIcon.style.visibility = "visible"
-  const promise = await fetch("https://words.dev-apis.com/validate-word", {
-    method: "POST",
+  loadingIcon.style.visibility = 'visible'
+  const promise = await fetch('https://words.dev-apis.com/validate-word', {
+    method: 'POST',
     body: JSON.stringify({ word: word }),
   })
   const result = await promise.json()
-  loadingIcon.style.visibility = "hidden"
+  loadingIcon.style.visibility = 'hidden'
   return result.validWord
 }
 
 async function getWordOfTheDay() {
-  loadingIcon.style.visibility = "visible"
-  const promise = await fetch("https://words.dev-apis.com/word-of-the-day")
+  loadingIcon.style.visibility = 'visible'
+  const promise = await fetch('https://words.dev-apis.com/word-of-the-day')
   const result = await promise.json()
-  loadingIcon.style.visibility = "hidden"
-  return result.word.toUpperCase().split("")
+  loadingIcon.style.visibility = 'hidden'
+  return result.word.toUpperCase().split('')
 }
 
 async function handleEnter() {
   const wordOfTheDay = await getWordOfTheDay()
   const userWord = Array.from(userWordContainer)
     .map((element) => element.innerText)
-    .join("")
+    .join('')
   const isValidWord = await validateWord(userWord)
 
-  const duplicateLetters = wordOfTheDay.filter((item, index) => wordOfTheDay.indexOf(item) !== index)
+  const duplicateLetters = wordOfTheDay.filter(
+    (item, index) => wordOfTheDay.indexOf(item) !== index
+  )
 
   if (!isValidWord) {
-    userWordContainer.forEach((element) => (element.style.animation = "border-flash 1s"))
+    userWordContainer.forEach((element) => (element.style.animation = 'border-flash 1s'))
     return
   }
 
   wordOfTheDay.forEach((correctLetter, index) => {
-    if (correctLetter === userWordContainer[index].innerText && !duplicateLetters.includes(correctLetter)) {
+    if (
+      correctLetter === userWordContainer[index].innerText &&
+      !duplicateLetters.includes(correctLetter)
+    ) {
       matchingLetters.push(correctLetter)
     }
   })
@@ -60,7 +65,7 @@ async function handleEnter() {
     const correctLetter = wordOfTheDay[index]
 
     if (userLetter === correctLetter) {
-      element.classList.add("correct-letter")
+      element.classList.add('correct-letter')
       return
     }
 
@@ -68,21 +73,21 @@ async function handleEnter() {
       if (!duplicateLetters.includes(userLetter)) {
         matchingLetters.push(userLetter)
       }
-      element.classList.add("semi-correct-letter")
+      element.classList.add('semi-correct-letter')
       return
     }
 
-    element.classList.add("wrong-letter")
+    element.classList.add('wrong-letter')
   })
 
-  if (userWord === wordOfTheDay.join("")) {
+  if (userWord === wordOfTheDay.join('')) {
     gameEnd = true
-    alert("You Win!")
+    alert('You Win!')
   }
 
-  if (rowNumber > 5 && userWord !== wordOfTheDay.join("")) {
+  if (rowNumber > 5 && userWord !== wordOfTheDay.join('')) {
     gameEnd = true
-    alert(`You Lost! The word of the day was ${wordOfTheDay.join("")}`)
+    alert(`You Lost! The word of the day was ${wordOfTheDay.join('')}`)
   }
 
   getNewUserLetters()
@@ -98,18 +103,18 @@ function handleKeyPress(event) {
     userLetterIndex++
   }
 
-  if (event.key === "Enter" && userLetterIndex === 5) {
+  if (event.key === 'Enter' && userLetterIndex === 5) {
     handleEnter()
   }
 
-  if (event.key === "Backspace" && userLetterIndex > 0) {
+  if (event.key === 'Backspace' && userLetterIndex > 0) {
     userLetterIndex--
-    userWordContainer[userLetterIndex].innerText = ""
+    userWordContainer[userLetterIndex].innerText = ''
   }
 }
 
 function initialise() {
-  document.querySelector("body").addEventListener("keyup", handleKeyPress)
+  document.querySelector('body').addEventListener('keyup', handleKeyPress)
 }
 
 initialise()
